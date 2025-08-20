@@ -1,0 +1,63 @@
+name: Build and Push Backstage Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ECR_REPOSITORY_URL: 355734424613.dkr.ecr.ap-southeast-2.amazonaws.com/backstage-ecr
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.ECR_REPOSITORY_URL }}:${{ env.IMAGE_TAG }} ./backstage-internal-developer-platform
+
+      - name: Save Docker image to a tar archive
+        run: |
+          docker save ${{ env.ECR_REPOSITORY_URL }}:${{ env.IMAGE_TAG }} -o backstage_image.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backstage-docker-image
+          path: backstage_image.tar
+
+  push-docker-image:
+    runs-on: ubuntu-latest
+    needs: build-docker-image
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backstage-docker-image
+          path: .
+
+      - name: Load Docker image from tar archive
+        run: |
+          docker load -i backstage_image.tar
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::355734424613:role/backstage-github-actions-role
+          aws-region: ap-southeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push image to Amazon ECR
+        run: |
+          docker push ${{ env.ECR_REPOSITORY_URL }}:${{ env.IMAGE_TAG }}

@@ -4,10 +4,6 @@ resource "aws_iam_openid_connect_provider" "github" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-resource "aws_ecr_repository" "backstage_repo" {
-  name = "backstage-repo"
-}
-
 resource "aws_iam_role" "github_actions_role" {
   name = "backstage-github-actions-role"
 
@@ -57,7 +53,7 @@ resource "aws_iam_policy" "ecr_push_policy" {
           "ecr:BatchGetImage",
           "ecr:GetDownloadUrlForLayer"
         ],
-        Resource = aws_ecr_repository.backstage_repo.arn
+        Resource = aws_ecr_repository.backstage_ecr_repo.arn
       }
     ]
   })
