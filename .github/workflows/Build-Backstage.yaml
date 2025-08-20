@@ -19,7 +19,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.ECR_REPOSITORY_URL }}:${{ env.IMAGE_TAG }} ./backstage-internal-developer-platform
+          docker build -t ${{ env.ECR_REPOSITORY_URL }}:${{ env.IMAGE_TAG }} ./backstage
 
       - name: Save Docker image to a tar archive
         run: |
