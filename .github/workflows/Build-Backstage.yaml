@@ -1,4 +1,4 @@
-name: Build and Push Backstage Docker Image
+name: Build & Push Backstage
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build-docker-image:
+  Build-Image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,9 +31,9 @@ jobs:
           name: backstage-docker-image
           path: backstage_image.tar
 
-  push-docker-image:
+  Push-Image:
     runs-on: ubuntu-latest
-    needs: build-docker-image
+    needs: Build-Image
     permissions:
       id-token: write
       contents: read

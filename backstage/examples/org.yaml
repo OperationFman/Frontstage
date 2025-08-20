@@ -1,17 +1,37 @@
----
-# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-user
-apiVersion: backstage.io/v1alpha1
-kind: User
-metadata:
-  name: guest
-spec:
-  memberOf: [guests]
----
-# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: guests
+  name: admins
+  description: The admin group for privileged access to the platform
 spec:
   type: team
+  profile:
+    displayName: Administrators
   children: []
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: read-only
+spec:
+  type: team
+  profile:
+    displayName: Read-Only Users
+  children: []
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: OperationFman
+spec:
+  memberOf: [admins]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: demo-user
+spec:
+  memberOf: [read-only]
