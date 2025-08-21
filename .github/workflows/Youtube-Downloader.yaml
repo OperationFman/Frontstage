@@ -29,9 +29,15 @@ jobs:
         with:
           cookies: ${{ secrets.YOUTUBE_COOKIES }}
 
+      - name: Get video title
+        id: get_title
+        run: |
+          title=$(yt-dlp --get-title "${{ github.event.inputs.youtube_url }}" | sed 's/[^a-zA-Z0-9_.-]/_/g')
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+
       - name: Download media file
         run: |
-          media_path="downloaded_media"
+          media_path="${{ steps.get_title.outputs.title }}"
           if [ "${{ github.event.inputs.media_type }}" == "Video with Audio" ]; then
             yt-dlp -o "${media_path}.%(ext)s" -f 'bestvideo+bestaudio/best' "${{ github.event.inputs.youtube_url }}"
           else
@@ -46,5 +52,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.inputs.media_type }}-file
+          name: ${{ steps.get_title.outputs.title }}
           path: ${{ env.DOWNLOADED_FILE_PATH }}
