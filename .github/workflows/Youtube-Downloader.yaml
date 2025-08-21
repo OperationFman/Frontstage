@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install yt-dlp
         run: |
@@ -41,6 +41,6 @@ jobs:
           yt-dlp -x --audio-format mp3 "${{ github.event.inputs.youtube_url }}"
 
       - name: Upload downloaded file as an artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ./*

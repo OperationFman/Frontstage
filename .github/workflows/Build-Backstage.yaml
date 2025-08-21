@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "backstage/**"
+      - "iac/**"
+      - ".github/workflows/Build-Backstage.yaml"
 
 env:
   ECR_REPOSITORY_URL: 355734424613.dkr.ecr.ap-southeast-2.amazonaws.com/backstage-ecr
