@@ -11,36 +11,40 @@ on:
         description: "Select Output:"
         required: true
         type: choice
-        default: "video"
+        default: "Video with Audio"
         options:
-          - "video"
-          - "audio"
+          - "Video with Audio"
+          - "Audio Only"
 
 jobs:
   download-media:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install yt-dlp
-        run: |
-          sudo apt-get update
-          sudo apt-get install ffmpeg
-          pip install yt-dlp
+      - uses: AnimMouse/setup-yt-dlp@v3
+
+      - uses: AnimMouse/setup-yt-dlp/cookies@v3
+        with:
+          cookies: ${{ secrets.YOUTUBE_COOKIES }}
 
       - name: Download video
-        if: github.event.inputs.media_type == 'video'
-        run: |
-          yt-dlp -f 'bestvideo+bestaudio/best' "${{ github.event.inputs.youtube_url }}"
+        if: github.event.inputs.media_type == 'Video with Audio'
+        run:
+          yt-dlp -f 'bestvideo+bestaudio/best' "${{
+          github.event.inputs.youtube_url }}"
 
       - name: Download audio
-        if: github.event.inputs.media_type == 'audio'
-        run: |
+        if: github.event.inputs.media_type == 'Audio Only'
+        run:
           yt-dlp -x --audio-format mp3 "${{ github.event.inputs.youtube_url }}"
 
-      - name: Upload downloaded file as an artifact
-        uses: actions/upload-artifact@v4
+      - uses: AnimMouse/setup-yt-dlp/cookies/update@v3
+        with:
+          cookies_secret_name: YOUTUBE_COOKIES
+          token: ${{ secrets.FRONTSTAGE_YOUTUBE_REFRESH }}
+
+      - uses: actions/upload-artifact@v4
         with:
           path: ./*
