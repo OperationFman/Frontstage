@@ -17,7 +17,7 @@ on:
           - "Audio Only"
 
 jobs:
-  download-media:
+  Download-Video:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,9 +39,9 @@ jobs:
         run: |
           media_path="${{ steps.get_title.outputs.title }}"
           if [ "${{ github.event.inputs.media_type }}" == "Video with Audio" ]; then
-            yt-dlp -o "${media_path}.%(ext)s" -f 'bestvideo+bestaudio/best' "${{ github.event.inputs.youtube_url }}"
+            yt-dlp -o "${media_path}.%(ext)s" -f 'bestvideo+bestaudio/best' --recode-video mp4 "${{ github.event.inputs.youtube_url }}"
           else
-            yt-dlp -o "${media_path}.%(ext)s" -f 'bestaudio/best' -x --audio-format mp3 "${{ github.event.inputs.youtube_url }}"
+            yt-dlp -o "${media_path}.%(ext)s" -x --audio-format mp3 "${{ github.event.inputs.youtube_url }}"
           fi
           echo "DOWNLOADED_FILE_PATH=$(ls ${media_path}.*)" >> $GITHUB_ENV
 
